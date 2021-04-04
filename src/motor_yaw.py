@@ -23,3 +23,8 @@ class MotorYaw:
         """Stops the motor and resets all previously set values to their default values
         """
         pass
+    
+    def test_git(self):
+        """Tests to make sure darian can edit stuff
+        """
+        pass
