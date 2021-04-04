@@ -33,7 +33,7 @@ class MotorBallFeed:
         # This variable will store the position of the motor (By default, it should be at pos. 1)
         self.bfm_pos = 1
 
-    def turn_on_motor(self):
+    def energize_motor(self):
         """Turns the motor on
         """
         # Set Enable pin to high to energize motor
@@ -97,3 +97,28 @@ class MotorBallFeed:
 
         # Motor is not energized
         self.motor_on = False
+
+
+def main():
+    # Initialize object
+    motor_ball_feed = MotorBallFeed()
+    # Turn motor on
+    motor_ball_feed.energize_motor()
+    # Get energized state of motor
+    print(motor_ball_feed.get_motor_state())
+    # Move motor forwards
+    motor_ball_feed.move_forward()
+    # Get position
+    print(motor_ball_feed.get_pos())
+    # Move motor backwards
+    motor_ball_feed.move_backward()
+    # Get position
+    print(motor_ball_feed.get_pos())
+    # Reset motor
+    motor_ball_feed.stop_and_reset_motor()
+    # Get energized state of motor
+    print(motor_ball_feed.get_motor_state())
+
+
+if __name__ == "__main__":
+    main()
