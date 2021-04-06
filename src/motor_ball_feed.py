@@ -82,11 +82,11 @@ class MotorBallFeed:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Unenergize the motor
-        gpio.output(self.en_pin, gpio.LOW)
-
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
+
+        # Unenergize the motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Update the state of position variable
         self.bfm_pos = 1
