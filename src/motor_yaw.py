@@ -32,7 +32,6 @@ class MotorYaw:
         # This variable will store the position of the motor (By default, it should be at pos. 1)
         self.ym_pos = 0
 
-
     def energize_motor(self):
         """Turns the motor on
         """
@@ -53,7 +52,6 @@ class MotorYaw:
 
         #Increment pos
         self.ym_pos += 1
-
 
     def move_backward(self):
         """Feed moves backward (pos. 1)
@@ -101,7 +99,6 @@ class MotorYaw:
 
         # Motor is not energized
         self.motor_on = False
-
 
 def main():
     # Initialize object
