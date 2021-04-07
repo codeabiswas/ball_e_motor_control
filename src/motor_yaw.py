@@ -1,7 +1,7 @@
 import Jetson.GPIO as gpio
 
 class MotorYaw:
-    """The Ball Feed Motor will be controlled using the 'Move to Absolute Position (2-Position, Home to Switch)' Setting. As Teknik puts it, 
+    """The Yaw Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. As Teknik puts it, 
     'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
     """
 
@@ -30,14 +30,17 @@ class MotorYaw:
         self.motor_on = False
 
         # This variable will store the position of the motor (By default, it should be at pos. 1)
-        self.ym_pos = 1
+        self.ym_pos = 0
+
 
     def energize_motor(self):
         """Turns the motor on
         """
         # Set Enable pin to high to energize motor
         gpio.output(self.en_pin, gpio.HIGH)
-
+        
+        #Initialize pos
+        self.ym_pos = 0
         # Motor is now energized
         self.motor_on = True
 
@@ -48,8 +51,9 @@ class MotorYaw:
         # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.HIGH)
 
-        # Update the state of position variable
-        self.ym_pos = 2
+        #Increment pos
+        self.ym_pos += 1
+
 
     def move_backward(self):
         """Feed moves backward (pos. 1)
@@ -58,8 +62,8 @@ class MotorYaw:
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
 
-        # Update the state of position variable
-        self.ym_pos = 1
+        #Decrement pos
+        self.ym_pos -= 1
 
     def get_motor_state(self):
         """Returns whether or not the motor is energized
@@ -79,15 +83,17 @@ class MotorYaw:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Unenergize the motor
-        #CONFUSION seems like htis just turns off the motor and can't this just be done in the cleanup line
+        #Set pos to 0 
+        #? Might need some time bull shit here
+        while self.ym_pos > 0:
+            self.move_backward()
+        while self.ym_pos < 0:
+            self.move_forward()
+        
+        #Turn off motor
         gpio.output(self.en_pin, gpio.LOW)
-
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
-
-        # Update the state of position variable
-        self.ypos = 1
 
         # Clean all BFM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
@@ -116,7 +122,6 @@ def main():
     motor_yaw.stop_and_reset_motor()
     # Get energized state of motor
     print(motor_yaw.get_motor_state())
-
 
 if __name__ == "__main__":
     main()
