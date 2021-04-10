@@ -107,11 +107,11 @@ class MotorFlywheelTop:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Unenergize the motor
-        gpio.output(self.en_pin, gpio.LOW)
-
         # Set Input B to low
         self.pwm.ChangeDutyCycle(0)
+
+        # Unenergize the motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Clean all FTM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
@@ -122,10 +122,6 @@ class MotorFlywheelTop:
         self.motor_on = False
 
 
-def dummy_speed_set_callback_func():
-    print("Desired speed set")
-
-
 def dummy_speed_unset_callback_func():
     print("Speed changing")
 
@@ -133,7 +129,6 @@ def dummy_speed_unset_callback_func():
 def main():
     # Initialize object
     motor_top_flywheel = MotorFlywheelTop(
-        speed_set_callback_func=dummy_speed_set_callback_func,
         speed_unset_callback_func=dummy_speed_unset_callback_func
     )
     # Turn motor on
@@ -142,11 +137,11 @@ def main():
     print(motor_top_flywheel.get_motor_state())
     # Set speeds 30-100 mph per 5 mph increment
     for speed in range(30, 105, 5):
+        print("Executing {} mph".format(speed))
         # As long as speed is not set
-        while not motor_top_flywheel.set_speed(speed):
-            print(dummy_speed_unset_callback_func())
+        motor_top_flywheel.set_speed(speed)
         # When speed has been set
-        print(dummy_speed_unset_callback_func())
+        print("Speed {} mph set".format(speed))
         # HLFB should be High
         print(motor_top_flywheel.hlfb_output())
     # Reset motor
