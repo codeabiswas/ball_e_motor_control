@@ -62,7 +62,7 @@ class MotorYaw:
 
         if num_pulses is None:
             # Calculate how many movements we need to achieve that degree
-            num_pulses = int(degree/self.rotation_to_degree)
+            num_pulses = abs(int(degree/self.rotation_to_degree))
 
         # Set Input A to high to move distance 2
         gpio.output(self.in_a_pin, gpio.HIGH)
@@ -79,7 +79,7 @@ class MotorYaw:
 
         if num_pulses is None:
             # Calculate how many movements we need to achieve that degree
-            num_pulses = int(degree/self.rotation_to_degree)
+            num_pulses = abs(int(degree/self.rotation_to_degree))
 
         # Set Input A to high to move distance 1
         gpio.output(self.in_a_pin, gpio.LOW)
