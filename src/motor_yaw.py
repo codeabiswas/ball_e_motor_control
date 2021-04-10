@@ -1,14 +1,16 @@
+import time
+
 import Jetson.GPIO as gpio
 
+
 class MotorYaw:
-    """The Ball Feed Motor will be controlled using the 'Move to Absolute Position (2-Position, Home to Switch)' Setting. As Teknik puts it, 
-    'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
+    """
     """
 
     def init(self):
         """Any motor intiialization code will go here
         Enable Pin: Pin 24 - Energizes the motor
-        Input A: Pin 26 - Selects the position (0 is pos. 1 and 1 is pos. 2)
+        Input A: Pin 26 - Selects the distance (0 is dist. 1 and 1 is dist. 2)
         Input B: Pin 6 (GND)
         HLFB: Pin 22
         """
@@ -29,8 +31,14 @@ class MotorYaw:
         # This variable will track whether or not the motor is energized
         self.motor_on = False
 
-        # This variable will store the position of the motor (By default, it should be at pos. 1)
-        self.ym_pos = 1
+        # Stores how many degrees yaw mechanism moves with one rotation of the motor
+        self.rotation_to_degree = 0.1
+
+        # This variable will store the position of the motor (By default, it should be centered - cnt. 0)
+        self.curr_encoder_count = 0
+
+        # This variable is the amount of time for triggering enable
+        self.en_trig_time = 0.5
 
     def energize_motor(self):
         """Turns the motor on
@@ -41,25 +49,46 @@ class MotorYaw:
         # Motor is now energized
         self.motor_on = True
 
-    def move_forward(self):
-        """Feed moves forward (pos. 2)
+    def pulse_enable(self):
+        """Pulsing the enable pin is how this motor knows to move the distance selected by Input A
+        """
+        gpio.output(self.en_pin, gpio.LOW)
+        time.sleep(self.en_trig_time)
+        gpio.output(self.en_pin, gpio.HIGH)
+
+    def move_right(self, degree, num_pulses=None):
+        """Yaw motor moves right by X degree
         """
 
-        # Set Input A to high to move to position 2
+        if num_pulses is None:
+            # Calculate how many movements we need to achieve that degree
+            num_pulses = int(degree/self.rotation_to_degree)
+
+        # Set Input A to high to move distance 2
         gpio.output(self.in_a_pin, gpio.HIGH)
 
-        # Update the state of position variable
-        self.ym_pos = 2
+        for _ in range(num_pulses):
+            self.pulse_enable()
 
-    def move_backward(self):
-        """Feed moves backward (pos. 1)
+        # Update the state of position variable
+        self.curr_encoder_count += num_pulses
+
+    def move_left(self, degree, num_pulses=None):
+        """Yaw motor moves left by X degree
         """
 
-        # Set Input A to low to move to position 1
+        if num_pulses is None:
+            # Calculate how many movements we need to achieve that degree
+            num_pulses = int(degree/self.rotation_to_degree)
+
+        # Set Input A to high to move distance 1
         gpio.output(self.in_a_pin, gpio.LOW)
 
+        for _ in range(num_pulses):
+            self.pulse_enable()
+
         # Update the state of position variable
-        self.ym_pos = 1
+        self.curr_encoder_count -= num_pulses
 
     def get_motor_state(self):
         """Returns whether or not the motor is energized
@@ -73,23 +102,26 @@ class MotorYaw:
         Returns:
             self.bfm_pos [int]: Number is analogous to position (1 -> pos. 1 and 2 -> pos. 2)
         """
-        return self.ym_pos
+        return self.curr_encoder_count
 
     def stop_and_reset_motor(self):
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Unenergize the motor
-        #CONFUSION seems like htis just turns off the motor and can't this just be done in the cleanup line
-        gpio.output(self.en_pin, gpio.LOW)
+        # Yaw motor facing right
+        if self.curr_encoder_count > 0:
+            self.move_left(degree=None, num_pulses=self.curr_encoder_count)
+        # Yaw motor facing left
+        elif self.curr_encoder_count < 0:
+            self.move_right(degree=None, num_pulses=self.curr_encoder_count)
 
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
 
-        # Update the state of position variable
-        self.ypos = 1
+        # Unenergize the motor
+        gpio.output(self.en_pin, gpio.LOW)
 
-        # Clean all BFM-related channels
+        # Clean all YM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
         gpio.cleanup(self.ym_channels)
 
@@ -104,14 +136,17 @@ def main():
     motor_yaw.energize_motor()
     # Get energized state of motor
     print(motor_yaw.get_motor_state())
-    # Move motor forwards
-    motor_yaw.move_forward()
+    time.sleep(2)
+    # Move motor right 90 degrees
+    motor_yaw.move_right(degree=90)
     # Get position
     print(motor_yaw.get_pos())
-    # Move motor backwards
-    motor_yaw.move_backward()
+    time.sleep(2)
+    # Move motor left 90 degrees
+    motor_yaw.move_left(degree=90)
     # Get position
     print(motor_yaw.get_pos())
+    time.sleep(2)
     # Reset motor
     motor_yaw.stop_and_reset_motor()
     # Get energized state of motor
