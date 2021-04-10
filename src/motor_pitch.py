@@ -1,5 +1,5 @@
 class MotorPitch:
-    """The PM Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. As Teknik puts it, 
+    """The PM Motor will be controlled using the 'Move to Incremental Distance (2 Distance, Home To Switch)' Setting. As Teknik puts it, 
     'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
     """
 
