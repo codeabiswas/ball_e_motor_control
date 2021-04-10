@@ -104,16 +104,23 @@ class MotorYaw:
         """
         return self.curr_encoder_count
 
+    def reset_yaw(self):
+        """Resets the yaw motor to center
+        """
+
+        # Yaw motor facing right, so move the opposite direction to reset
+        if self.curr_encoder_count > 0:
+            self.move_left(degree=None, num_pulses=self.curr_encoder_count)
+        # Yaw motor facing left, so move the opposite direction to reset
+        elif self.curr_encoder_count < 0:
+            self.move_right(degree=None, num_pulses=self.curr_encoder_count)
+
     def stop_and_reset_motor(self):
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Yaw motor facing right
-        if self.curr_encoder_count > 0:
-            self.move_left(degree=None, num_pulses=self.curr_encoder_count)
-        # Yaw motor facing left
-        elif self.curr_encoder_count < 0:
-            self.move_right(degree=None, num_pulses=self.curr_encoder_count)
+        # Reset the yaw motor
+        self.reset_yaw()
 
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
