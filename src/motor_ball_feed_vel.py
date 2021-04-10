@@ -44,22 +44,35 @@ class MotorBallFeed:
         # Motor is now energized
         self.motor_on = True
 
-    def move_forward(self):
+    def move_forward(self, rof_time=1):
         """Feed moves forward (pos. 2)
         """
+        # XX - A B
+        # Forward: 10
+        # Backward: 00
 
         # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.HIGH)
+        # Set Enable pin to high to energize motor
+        gpio.output(self.en_pin, gpio.HIGH)
+        time.sleep(rof_time)
+        # Set Enable pin to low to stop energizing motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Update the state of position variable
         self.bfm_pos = 2
 
-    def move_backward(self):
+    def move_backward(self,rof_time=1):
         """Feed moves backward (pos. 1)
         """
 
-        # Set Input A to low to move to position 1
+        # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.LOW)
+        # Set Enable pin to high to energize motor
+        gpio.output(self.en_pin, gpio.HIGH)
+        time.sleep(rof_time)
+        # Set Enable pin to low to stop energizing motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Update the state of position variable
         self.bfm_pos = 1
@@ -84,8 +97,8 @@ class MotorBallFeed:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Set Input A to low to move to position 1
-        gpio.output(self.in_a_pin, gpio.LOW)
+        # # Set Input A to low to move to position 1
+        # gpio.output(self.in_a_pin, gpio.LOW)
 
         # Unenergize the motor
         gpio.output(self.en_pin, gpio.LOW)
@@ -103,19 +116,19 @@ class MotorBallFeed:
 def main():
     # Initialize object
     motor_ball_feed = MotorBallFeed()
-    time.sleep(2)
+    # time.sleep(2)
     # Turn motor on
-    motor_ball_feed.energize_motor()
+    # motor_ball_feed.energize_motor()
     # Get energized state of motor
-    print(motor_ball_feed.get_motor_state())
+    # print(motor_ball_feed.get_motor_state())
     time.sleep(2)
     # Move motor forwards
-    motor_ball_feed.move_forward()
+    motor_ball_feed.move_forward(rof_time=2.5)
     # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
     # Move motor backwards
-    motor_ball_feed.move_backward()
+    motor_ball_feed.move_backward(rof_time=2.5)
     # # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
