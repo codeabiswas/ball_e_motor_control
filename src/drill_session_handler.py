@@ -35,21 +35,18 @@ class DrillSessionHandler:
         self.pm = motor_pitch.MotorPitch()
         self.ym = motor_yaw.MotorYaw()
 
-        # How long it takes (in seconds) for the ball to catch onto the flywheels, in which case the BFM moves back
-        self.bfm_wait = 1
-
     def start_drill(self):
         """Executes all the steps required to start an automated or manual drill, such as enabling the motor
         NOTE: Possibly store all possible pitch and yaw angle requirements from the current position here. This would expedite the shooting process
         """
 
         # Enable all motors
-        # NOTE: Order matters!
+        # NOTE 1: Order matters!
+        # NOTE 2: BFM not energized since it will cause motor to move
         self.fmt.energize_motor()
         self.fmb.energize_motor()
         self.ym.energize_motor()
         self.pm.energize_motor()
-        self.bfm.energize_motor()
         # NOTE: BQM may need to be enabled right before running the drill
         self.bqm.energize_motor()
 
@@ -67,18 +64,18 @@ class DrillSessionHandler:
             shot_loc ([str]): Shot location
             ball_speed ([int]): Ball speed
         """
-        # 1. Drop a ball by moving the ball queue motor
-        self.bqm.move_queue()
-
-        # 2. Adjust pitch and yaw motor appropriately
-        # 2.1: Get which goal area it the drill shot needs to happen in terms of angle that pitch and yaw need to be adjusted
+        # 1. Adjust pitch and yaw motor appropriately
+        # 1.1: Get which goal area it the drill shot needs to happen in terms of angle that pitch and yaw need to be adjusted
         # NOTE: This substep will call the trajectory class
-        # 2.2: Set pitch and yaw at that angle
+        # 1.2: Set pitch and yaw at that angle
         self.ym.set_angle("")
         self.pm.set_angle("")
 
-        # 3. Set the speed of both flywheels
+        # 2. Set the speed of both flywheels
         self.set_flywheel_speeds(ball_speed)
+
+        # 3. Drop a ball by moving the ball queue motor
+        self.bqm.move_queue()
 
         # 4. Shoot the ball
         self.bfm_shoot_movement()
@@ -87,10 +84,12 @@ class DrillSessionHandler:
         """Ball feeding mechanism movement
         """
 
+        # TODO: Wait for some time based on ROF
+
         # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
         self.bfm.move_forward()
-        time.sleep(self.bfm_wait)
         self.bfm.move_backward()
+        # TODO: Wait for some time based on ROF
 
     def set_flywheel_speeds(self, speed):
         """Top and Bottom Flywheels speed setter
