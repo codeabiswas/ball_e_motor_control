@@ -1,4 +1,5 @@
 import math
+import time
 
 import Jetson.GPIO as gpio
 
@@ -7,7 +8,7 @@ class MotorFlywheelBottom:
     """The Bottom Flywheel Motor will be controlled using the 'Unipolar PWM command'. This motor will be running clockwise.
     """
 
-    def init(self, speed_unset_callback_func):
+    def __init__(self, speed_unset_callback_func):
         """Any motor intiialization code will go here
 
         Enable Pin: Pin 31 - Energizes the motor
@@ -19,7 +20,8 @@ class MotorFlywheelBottom:
         """
 
         # The flywheel's diameter (in inches)
-        self.flywheel_diam = 16.5
+        # self.flywheel_diam = 16.5
+        self.flywheel_diam = 0.5
         # The flywheel's circumference (in inches)
         self.flywheel_circ = self.flywheel_diam * math.pi
         # The flywheel motor's max RPM
@@ -43,8 +45,8 @@ class MotorFlywheelBottom:
         self.ftm_out_channels = [self.en_pin, self.in_b_pin]
         gpio.setup(self.ftm_out_channels, gpio.OUT, initial=gpio.LOW)
         gpio.setup(self.hlfb_pin, gpio.IN)
-        gpio.add_event_detect(self.hlfb_pin, gpio.FALLING,
-                              callback=speed_unset_callback_func)
+        # gpio.add_event_detect(self.hlfb_pin, gpio.FALLING,
+        #                       callback=speed_unset_callback_func)
 
         # Initialize PWM w/ frequency
         self.pwm = gpio.PWM(self.in_b_pin, self.pwm_freq)
@@ -84,7 +86,8 @@ class MotorFlywheelBottom:
         self.pwm.ChangeDutyCycle(req_duty_cycle)
 
         # Block thread until speed has been set
-        gpio.wait_for_edge(self.in_b_pin, gpio.RISING)
+        # gpio.wait_for_edge(self.hlfb_pin, gpio.RISING)
+        time.sleep(10)
 
         return True
 
@@ -135,7 +138,8 @@ def main():
     # Get energized state of motor
     print(motor_bottom_flywheel.get_motor_state())
     # Set speeds 30-100 mph per 5 mph increment
-    for speed in range(30, 105, 5):
+    # for speed in range(30, 105, 5):
+    for speed in range(1, 4):
         print("Executing {} mph".format(speed))
         # As long as speed is not set
         motor_bottom_flywheel.set_speed(speed)
