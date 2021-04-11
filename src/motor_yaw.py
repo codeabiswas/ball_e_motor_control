@@ -7,7 +7,7 @@ class MotorYaw:
     """
     """
 
-    def init(self):
+    def __init__(self):
         """Any motor intiialization code will go here
         Enable Pin: Pin 24 - Energizes the motor
         Input A: Pin 26 - Selects the distance (0 is dist. 1 and 1 is dist. 2)
@@ -32,13 +32,13 @@ class MotorYaw:
         self.motor_on = False
 
         # Stores how many degrees yaw mechanism moves with one rotation of the motor
-        self.rotation_to_degree = 0.1
+        self.rotation_to_degree = 10
 
         # This variable will store the position of the motor (By default, it should be centered - cnt. 0)
         self.curr_encoder_count = 0
 
         # This variable is the amount of time for triggering enable
-        self.en_trig_time = 0.5
+        self.en_trig_time = 0.02
 
     def energize_motor(self):
         """Turns the motor on
