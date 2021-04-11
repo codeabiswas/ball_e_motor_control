@@ -8,7 +8,7 @@ class MotorPitch:
     'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
     """
 
-    def init(self):
+    def __init__(self):
         """Any motor intiialization code will go here
         Enable Pin: Pin 21- Energizes the motor
         Input A: Pin 23 - Selects the position (0 is pos. 1 and 1 is pos. 2)
@@ -33,13 +33,13 @@ class MotorPitch:
         self.motor_on = False
 
         # Stores how many degrees yaw mechanism moves with one rotation of the motor
-        self.rotation_to_degree = 0.1
+        self.rotation_to_degree = 10
 
         # This variable will store the position of the motor (By default, it should be centered - cnt. 0)
         self.curr_encoder_count = 0
 
         # This variable is the amount of time for triggering enable
-        self.en_trig_time = 0.5
+        self.en_trig_time = 0.02
 
     def energize_motor(self):
         """Turns the motor on
@@ -131,7 +131,7 @@ class MotorPitch:
 
         # Clean all YM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
-        gpio.cleanup(self.ym_channels)
+        gpio.cleanup(self.pm_channels)
 
         # Motor is not energized
         self.motor_on = False
@@ -146,12 +146,12 @@ def main():
     print(motor_pitch.get_motor_state())
     time.sleep(2)
     # Move motor up 60 degrees
-    motor_pitch.pitch_up(degree=60)
+    motor_pitch.pitch_up(degree=10)
     # Get position
     print(motor_pitch.get_pos())
     time.sleep(2)
     # Move motor down 60 degrees
-    motor_pitch.pitch_down(degree=60)
+    motor_pitch.pitch_down(degree=10)
     # Get position
     print(motor_pitch.get_pos())
     time.sleep(2)
