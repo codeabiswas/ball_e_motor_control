@@ -8,7 +8,7 @@ class MotorBallQueue:
     'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
     """
 
-    def init(self):
+    def __init__(self):
         """Any motor intiialization code will go here
         Enable Pin: Pin 37- Energizes the motor
         Input A: Pin 40 - Selects the position (0 is pos. 1 and 1 is pos. 2)
@@ -82,20 +82,10 @@ def main():
     motor_bqm.energize_motor()
     # Get energized state of motor
     print(motor_bqm.get_motor_state())
-    # Move motor forwards
-    motor_bqm.turn_once()
-    # Get position
-    print(motor_bqm.get_pos())
-    time.sleep(2)
-    # Move motor forwards
-    motor_bqm.turn_once()
-    # Get position
-    print(motor_bqm.get_pos())
-    time.sleep(2)
-    # Move motor forwards
-    motor_bqm.turn_once()
-    # Get position
-    print(motor_bqm.get_pos())
+    for _ in range(3):
+        # Move motor forwards
+        motor_bqm.turn_once()
+        time.sleep(2)
     # Reset motor
     motor_bqm.stop_and_reset_motor()
     # Get energized state of motor
