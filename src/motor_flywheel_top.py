@@ -91,9 +91,8 @@ class MotorFlywheelTop:
         # Change duty cycle to that percentage
         self.pwm.ChangeDutyCycle(req_duty_cycle)
 
-        # Block thread until speed has been set
-        # gpio.wait_for_edge(self.hlfb_pin, gpio.RISING)
-        time.sleep(10)
+        # Block thread until speed has been set or timeout of 10 seconds has been reached (whichever is first)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
 
         return True
 
