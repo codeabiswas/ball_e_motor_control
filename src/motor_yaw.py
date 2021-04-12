@@ -21,12 +21,15 @@ class MotorYaw:
         # Assign pin numbers to respective signals
         self.en_pin = 24
         self.in_a_pin = 26
+        self.hlfb_pin = 22
 
         # Set up channels
         # Enable pin set to low (unenergized)
         # Input A pin set to low (Position 1)
+        # HLFB pin set as input
         self.ym_channels = [self.en_pin, self.in_a_pin]
         gpio.setup(self.ym_channels, gpio.OUT, initial=gpio.LOW)
+        gpio.setup(self.hlfb_pin, gpio.IN)
 
         # This variable will track whether or not the motor is energized
         self.motor_on = False
@@ -70,6 +73,9 @@ class MotorYaw:
         for _ in range(num_pulses):
             self.pulse_enable()
 
+        # Block the thread until rising edge has been detected OR 10 seconds have passed (whichever is first)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
+
         # Update the state of position variable
         self.curr_encoder_count += num_pulses
 
@@ -86,6 +92,9 @@ class MotorYaw:
 
         for _ in range(num_pulses):
             self.pulse_enable()
+
+        # Block the thread until rising edge has been detected OR 10 seconds have passed (whichever is first)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
 
         # Update the state of position variable
         self.curr_encoder_count -= num_pulses
@@ -131,6 +140,7 @@ class MotorYaw:
         # Clean all YM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
         gpio.cleanup(self.ym_channels)
+        gpio.cleanup(self.hlfb_pin)
 
         # Motor is not energized
         self.motor_on = False
