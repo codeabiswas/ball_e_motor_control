@@ -27,6 +27,10 @@ class DrillSessionHandler:
         self.profiler = helper_profiler.Profiler()
         self.drill_info = self.profiler.get_profile_info(self.drill_name)
 
+        # Initialize Trajectory Algorithm Helper
+        # TODO: Call the actual class here
+        self.trajectory_algo = None
+
         # Initialize all motors
         self.bfm = motor_ball_feed.MotorBallFeed()
         self.bqm = motor_ball_queue.MotorBallQueue()
@@ -66,10 +70,10 @@ class DrillSessionHandler:
         """
         # 1. Adjust pitch and yaw motor appropriately
         # 1.1: Get which goal area it the drill shot needs to happen in terms of angle that pitch and yaw need to be adjusted
-        # NOTE: This substep will call the trajectory class
+        yaw_angle, pitch_angle = self.get_shot_angles(shot_loc)
         # 1.2: Set pitch and yaw at that angle
-        self.ym.set_angle("")
-        self.pm.set_angle("")
+        self.ym.set_angle(yaw_angle)
+        self.pm.set_angle(pitch_angle)
 
         # 2. Set the speed of both flywheels
         self.set_flywheel_speeds(ball_speed)
@@ -79,6 +83,17 @@ class DrillSessionHandler:
 
         # 4. Shoot the ball
         self.bfm_shoot_movement()
+
+    def get_shot_angles(self, shot_loc):
+        """Returns the shot angles required for pitch and yaw from set distance
+
+        Args:
+            shot_loc (string): Shot location on the lacrosse goal (TL, TM, TR, CL, CM, CR, BL, BM, BR)
+
+        Returns:
+            [tuple]: Yaw degree, Pitch degree
+        """
+        return (self.trajectory_algo.calc_yaw(shot_loc), self.trajectory_algo.calc_pitch(shot_loc))
 
     def bfm_shoot_movement(self):
         """Ball feeding mechanism movement
