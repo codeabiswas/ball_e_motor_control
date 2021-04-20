@@ -100,6 +100,7 @@ class MotorBallFeed:
         # Motor is not energized
         self.motor_on = False
 
+
 def main():
     # Initialize object
     motor_ball_feed = MotorBallFeed()
