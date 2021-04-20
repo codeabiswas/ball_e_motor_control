@@ -1,5 +1,6 @@
 import Jetson.GPIO as gpio
 
+
 class MotorYaw:
     """The Yaw Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. As Teknik puts it, 
     'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
@@ -37,8 +38,8 @@ class MotorYaw:
         """
         # Set Enable pin to high to energize motor
         gpio.output(self.en_pin, gpio.HIGH)
-        
-        #Initialize pos
+
+        # Initialize pos
         self.ym_pos = 0
         # Motor is now energized
         self.motor_on = True
@@ -50,7 +51,7 @@ class MotorYaw:
         # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.HIGH)
 
-        #Increment pos
+        # Increment pos
         self.ym_pos += 1
 
     def move_backward(self):
@@ -60,7 +61,7 @@ class MotorYaw:
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
 
-        #Decrement pos
+        # Decrement pos
         self.ym_pos -= 1
 
     def get_motor_state(self):
@@ -81,14 +82,14 @@ class MotorYaw:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        #Set pos to 0 
-        #? Might need some time bull shit here
+        # Set pos to 0
+        # ? Might need some time bull shit here
         while self.ym_pos > 0:
             self.move_backward()
         while self.ym_pos < 0:
             self.move_forward()
-        
-        #Turn off motor
+
+        # Turn off motor
         gpio.output(self.en_pin, gpio.LOW)
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
@@ -99,6 +100,7 @@ class MotorYaw:
 
         # Motor is not energized
         self.motor_on = False
+
 
 def main():
     # Initialize object
@@ -119,6 +121,7 @@ def main():
     motor_yaw.stop_and_reset_motor()
     # Get energized state of motor
     print(motor_yaw.get_motor_state())
+
 
 if __name__ == "__main__":
     main()

@@ -29,18 +29,18 @@ class MotorPitch:
 
         # This variable will store the position of the motor (By default, it should be at pos. 1)
         self.pm_pos = 0
-    
+
     def energize_motor(self):
         """Turns the motor on
         """
         # Set Enable pin to high to energize motor
         gpio.output(self.en_pin, gpio.HIGH)
-        
-        #Initialize pos
+
+        # Initialize pos
         self.pm_pos = 0
         # Motor is now energized
-        self.motor_on = True    
-    
+        self.motor_on = True
+
     def move_forward(self):
         """Feed moves forward (pos. 2)
         """
@@ -48,9 +48,9 @@ class MotorPitch:
         # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.HIGH)
 
-        #Increment pos
-        self.pm_pos += 1   
-    
+        # Increment pos
+        self.pm_pos += 1
+
     def move_backward(self):
         """Feed moves backward (pos. 1)
         """
@@ -58,9 +58,9 @@ class MotorPitch:
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
 
-        #Decrement pos
-        self.pm_pos -= 1    
-    
+        # Decrement pos
+        self.pm_pos -= 1
+
     def get_motor_state(self):
         """Returns whether or not the motor is energized
         Returns:
@@ -79,14 +79,14 @@ class MotorPitch:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        #Set pos to 0 
-        #? Might need some time bull shit here
+        # Set pos to 0
+        # ? Might need some time bull shit here
         while self.pm_pos > 0:
             self.move_backward()
         while self.pm_pos < 0:
             self.move_forward()
-        
-        #Turn off motor
+
+        # Turn off motor
         gpio.output(self.en_pin, gpio.LOW)
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
@@ -97,6 +97,7 @@ class MotorPitch:
 
         # Motor is not energized
         self.motor_on = False
+
 
 def main():
     # Initialize object
@@ -117,6 +118,7 @@ def main():
     motor_pitch.stop_and_reset_motor()
     # Get energized state of motor
     print(motor_pitch.get_motor_state())
+
 
 if __name__ == "__main__":
     main()
