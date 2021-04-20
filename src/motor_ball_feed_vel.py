@@ -4,16 +4,20 @@ import Jetson.GPIO as gpio
 
 
 class MotorBallFeed:
-    """The Ball Feed Motor will be controlled using the 'Move to Absolute Position (2-Position, Home to Switch)' Setting. As Teknik puts it, 'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
+    """The Ball Feed Motor will be controlled using the 'Ramp Up/Down to Selected Velocity' Setting.
     """
 
     def __init__(self):
         """Any motor intiialization code will go here
 
         Enable Pin: Pin 36 - Energizes the motor
-        Input A: Pin 38 - Selects the position (0 is pos. 1 and 1 is pos. 2)
+        Input A: Pin 38 - Selects the velocity (0 selects backwards velocity (i.e.: pos. 1) and 1 selects forward velocity (i.e.: pos. 2))
         Input B: Pin 6 (GND)
         HLFB: Pin 6 (GND)
+
+        # XX - Input A | Input B
+        # Forward: 10
+        # Backward: 00
         """
 
         # Board pin-numbering scheme
@@ -44,22 +48,32 @@ class MotorBallFeed:
         # Motor is now energized
         self.motor_on = True
 
-    def move_forward(self):
+    def move_forward(self, rof_time=1):
         """Feed moves forward (pos. 2)
         """
 
         # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.HIGH)
+        # Set Enable pin to high to energize motor
+        gpio.output(self.en_pin, gpio.HIGH)
+        time.sleep(rof_time)
+        # Set Enable pin to low to stop energizing motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Update the state of position variable
         self.bfm_pos = 2
 
-    def move_backward(self):
+    def move_backward(self, rof_time=1):
         """Feed moves backward (pos. 1)
         """
 
-        # Set Input A to low to move to position 1
+        # Set Input A to high to move to position 2
         gpio.output(self.in_a_pin, gpio.LOW)
+        # Set Enable pin to high to energize motor
+        gpio.output(self.en_pin, gpio.HIGH)
+        time.sleep(rof_time)
+        # Set Enable pin to low to stop energizing motor
+        gpio.output(self.en_pin, gpio.LOW)
 
         # Update the state of position variable
         self.bfm_pos = 1
@@ -84,8 +98,9 @@ class MotorBallFeed:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # Set Input A to low to move to position 1
-        gpio.output(self.in_a_pin, gpio.LOW)
+        # If BF is in forward position, move backwards
+        if self.bfm_pos == 2:
+            self.move_backward()
 
         # Unenergize the motor
         gpio.output(self.en_pin, gpio.LOW)
@@ -105,18 +120,13 @@ def main():
     # Initialize object
     motor_ball_feed = MotorBallFeed()
     time.sleep(2)
-    # Turn motor on
-    motor_ball_feed.energize_motor()
-    # Get energized state of motor
-    print(motor_ball_feed.get_motor_state())
-    time.sleep(2)
     # Move motor forwards
-    motor_ball_feed.move_forward()
+    motor_ball_feed.move_forward(rof_time=2.5)
     # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
     # Move motor backwards
-    motor_ball_feed.move_backward()
+    motor_ball_feed.move_backward(rof_time=2.5)
     # # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
