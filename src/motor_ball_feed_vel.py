@@ -98,7 +98,7 @@ class MotorBallFeed:
         """Stops the motor and resets all previously set values to their default values
         """
 
-        # If BF is in forward position, move backwards
+        # # If BF is in forward position, move backwards
         if self.bfm_pos == 2:
             self.move_backward()
 
@@ -119,14 +119,15 @@ class MotorBallFeed:
 def main():
     # Initialize object
     motor_ball_feed = MotorBallFeed()
-    time.sleep(2)
+    # time.sleep(2)
     # Move motor forwards
-    motor_ball_feed.move_forward(rof_time=2.5)
+    # motor_ball_feed.move_forward(rof_time=2.5)
+    motor_ball_feed.move_forward(rof_time=1.1)
     # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
     # Move motor backwards
-    motor_ball_feed.move_backward(rof_time=2.5)
+    motor_ball_feed.move_backward(rof_time=1.1)
     # # Get position
     print(motor_ball_feed.get_pos())
     time.sleep(2)
