@@ -1,35 +1,44 @@
-import time
-
-import helper_profiler
-import motor_ball_feed
-import motor_ball_queue
-import motor_flywheel_bottom
-import motor_flywheel_top
-import motor_pitch
-import motor_yaw
+try:
+    import sys
+    from pathlib import Path
+    sys.path.append(
+        "{}/Developer/ball_e_image_processing/src".format(Path.home()))
+    import trajectory_algorithm
+except:
+    print("Import failed")
+finally:
+    import helper_profiler
+    import motor_ball_feed
+    import motor_ball_queue
+    import motor_flywheel_bottom
+    import motor_flywheel_top
+    import motor_pitch
+    import motor_yaw
 
 
 class DrillSessionHandler:
     """This class handles all actual automated or manual drill execution, including sending instructions to motors appropriately
     """
 
-    def __init__(self, drill_name=None, goalie_name=None):
+    def __init__(self, distance_from_goal, drill_name=None, goalie_name=None):
         """Initializes the drill session handler
 
         Args:
+            distance_from_goal ([float]): The distance from Ball-E to the goal in feet
             drill_name ([str], optional): Name of the drill to be executed for an automated session. If manual training session, defaults to None.
             goalie_name ([str], optional): Goalie's name for an automated session. If manual training, defaults to None.
         """
         self.drill_name = drill_name
         self.goalie_name = goalie_name
+        self.distance_from_goal = distance_from_goal
 
         # Load the drill process
         self.profiler = helper_profiler.Profiler()
         self.drill_info = self.profiler.get_profile_info(self.drill_name)
 
         # Initialize Trajectory Algorithm Helper
-        # TODO: Call the actual class here
-        self.trajectory_algo = None
+        self.trajectory_algo = trajectory_algorithm.TrajectoryAlgorithm(
+            self.distance_from_goal)
 
         # Initialize all motors
         self.bfm = motor_ball_feed.MotorBallFeed()
