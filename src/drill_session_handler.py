@@ -32,6 +32,9 @@ class DrillSessionHandler:
         self.goalie_name = goalie_name
         self.distance_from_goal = distance_from_goal
 
+        # The first ball (index 0) means ball queue needs to rotate 1/36. The rest will rotate 1/18.
+        self.first_ball = True
+
         # Load the drill process
         self.profiler = helper_profiler.Profiler()
         self.drill_info = self.profiler.get_profile_info(self.drill_name)
@@ -88,7 +91,7 @@ class DrillSessionHandler:
         self.set_flywheel_speeds(ball_speed)
 
         # 3. Drop a ball by moving the ball queue motor
-        self.bqm.move_queue()
+        self.bqm_move_queue()
 
         # 4. Shoot the ball
         self.bfm_shoot_movement()
@@ -103,6 +106,16 @@ class DrillSessionHandler:
             [tuple]: Yaw degree, Pitch degree
         """
         return (self.trajectory_algo.calc_yaw(shot_loc), self.trajectory_algo.calc_pitch(shot_loc))
+
+    def bqm_move_queue(self):
+        """Rotates the ball queue so that a ball can drop into the ball feed
+        """
+        if self.first_ball == 0:
+            self.bqm.turn_once_half()
+        else:
+            self.bqm.turn_once_full()
+
+        self.first_ball += 1
 
     def bfm_shoot_movement(self):
         """Ball feeding mechanism movement

@@ -4,8 +4,7 @@ import Jetson.GPIO as gpio
 
 
 class MotorBallQueue:
-    """The BQM Motor will be controlled using the 'Move to Incremental Distance (1 Distance, Home To Switch)' Setting. As Teknik puts it,
-    'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
+    """The BQM Motor will be controlled using the 'Move to Incremental Distance (2 Distance, Home To Switch)' Setting.
     """
 
     def __init__(self):
@@ -32,6 +31,9 @@ class MotorBallQueue:
         # This variable will track whether or not the motor is energized
         self.motor_on = False
 
+        # This variable is the amount of time for triggering enable
+        self.en_trig_time = 0.02
+
     def energize_motor(self):
         """Turns the motor on
         """
@@ -41,14 +43,28 @@ class MotorBallQueue:
         # Motor is now energized
         self.motor_on = True
 
-    def turn_once(self):
+    def pulse_enable(self):
+        """Pulsing the enable pin is how this motor knows to move the distance selected by Input A
+        """
+        gpio.output(self.en_pin, gpio.LOW)
+        time.sleep(self.en_trig_time)
+        gpio.output(self.en_pin, gpio.HIGH)
+
+    def turn_once_half(self):
+        """BQM turns half a rotation which allows one ball to fall
+        """
+
+        # Set Input A to high to move half distance
+        gpio.output(self.in_a_pin, gpio.HIGH)
+        self.pulse_enable()
+
+    def turn_once_full(self):
         """BQM turns a rotation which allows one ball to fall
         """
 
-        # Set Input A to high to move
-        gpio.output(self.in_a_pin, gpio.HIGH)
-        time.sleep(0.5)
+        # Set Input A to low to move
         gpio.output(self.in_a_pin, gpio.LOW)
+        self.pulse_enable()
 
     def get_motor_state(self):
         """Returns whether or not the motor is energized
@@ -60,6 +76,9 @@ class MotorBallQueue:
     def stop_and_reset_motor(self):
         """Stops the motor and resets all previously set values to their default values
         """
+
+        # Turn BQ half a rotation
+        self.turn_once_half()
 
         # Set Input A to low to move to position 1
         gpio.output(self.in_a_pin, gpio.LOW)
@@ -82,9 +101,13 @@ def main():
     motor_bqm.energize_motor()
     # Get energized state of motor
     print(motor_bqm.get_motor_state())
-    for _ in range(3):
-        # Move motor forwards
-        motor_bqm.turn_once()
+    # Turn the queue 3 times for 3 balls to fall
+    for turn in range(3):
+        if turn == 0:
+            motor_bqm.turn_once_half()
+        else:
+            # Move motor forwards
+            motor_bqm.turn_once_full()
         time.sleep(2)
     # Reset motor
     motor_bqm.stop_and_reset_motor()
