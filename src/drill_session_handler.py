@@ -124,8 +124,16 @@ class DrillSessionHandler:
         # TODO: Wait for some time based on ROF
 
         # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
+        #Currently waiting 1.1 seconds each direction of the bfm movement
+        #2.2 seconds total
+        #So wait (ROF-2.2)/2 in each direction and hope that the LAX ball has fallen by then
+
+
+        time.sleep((ROF-2.2)/2)
         self.bfm.move_forward()
         self.bfm.move_backward()
+        time.sleep((ROF-2.2)/2)
+
         # TODO: Wait for some time based on ROF
 
     def set_flywheel_speeds(self, speed):
