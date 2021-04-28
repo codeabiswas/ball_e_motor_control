@@ -24,7 +24,6 @@ class ThreadedDrillSessionHandler(QThread):
     """This class handles all actual automated or manual drill execution, including sending instructions to motors appropriately
     """
     run_drill_signal = pyqtSignal(bool)
-    process_ball_signal = pyqtSignal(bool)
 
     def __init__(self, distance_from_goal, drill_name=None, goalie_name=None):
         """Initializes the drill session handler
@@ -99,7 +98,6 @@ class ThreadedDrillSessionHandler(QThread):
             ball_speed ([int]): Ball speed
         """
         if self.run_drill:
-            self.process_ball_signal.emit(True)
             print("\n\nShot location: {}".format(shot_loc))
             # 1. Adjust pitch and yaw motor appropriately
             # 1.1: Get which goal area it the drill shot needs to happen in terms of angle that pitch and yaw need to be adjusted
@@ -136,7 +134,6 @@ class ThreadedDrillSessionHandler(QThread):
 
             # Update shot location for relative test
             self.prev_shot_loc = shot_loc
-            self.process_ball_signal.emit(False)
 
     def get_shot_angles(self, shot_loc):
         """Returns the shot angles required for pitch and yaw from set distance
