@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 
-class Profiler():
+class Profiler:
 
     def save_drill_to_goalie_profile(self, goalie_name, drill_name):
         goalie_path = str(Path.home())+"/Documents/ball_e_profiles/goalie_profiles/{goalie_name}/{goalie_name}.csv".format(
