@@ -43,7 +43,7 @@ class ThreadedDrillSessionHandler(QThread):
         # The first ball (index 0) means ball queue needs to rotate 1/36. The rest will rotate 1/18.
         self.first_ball = True
 
-        if drill_name is not None:
+        if self.drill_name is not None:
             # Load the drill process
             self.profiler = helper_profiler.Profiler()
             self.drill_info = self.profiler.get_profile_info(self.drill_name)
