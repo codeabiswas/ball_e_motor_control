@@ -74,6 +74,9 @@ class DrillSessionHandler:
         # NOTE: BQM may need to be enabled right before running the drill
         self.bqm.energize_motor()
 
+        # Enabling motors takes time
+        time.sleep(2)
+
     def run_automated_drill(self):
         """Runs an automated drill session
         """
@@ -221,8 +224,6 @@ def run_manual_session():
 def run_automated_session():
     automated_session = DrillSessionHandler(10, drill_name="t_drill")
     automated_session.start_drill()
-    # NOTE: This is required!!!
-    time.sleep(2)
     automated_session.run_automated_drill()
     automated_session.stop_drill()
 
