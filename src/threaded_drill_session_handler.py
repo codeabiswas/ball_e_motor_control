@@ -7,6 +7,8 @@ try:
 except:
     print("Import failed")
 finally:
+    import csv
+    import datetime
     import time
 
     from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
@@ -46,8 +48,9 @@ class ThreadedDrillSessionHandler(QThread):
 
         if self.drill_name is not None:
             # Load the drill process
-            self.profiler = helper_profiler.Profiler
-            self.drill_info = self.profiler.get_profile_info(self.drill_name)
+            # self.profiler = helper_profiler.Profiler()
+            # self.drill_info = self.profiler.get_profile_info(self.drill_name)
+            self.drill_info = self.profiler.get_profile_info()
 
             self.rof = int(self.drill_info['1'][2])
 
@@ -195,8 +198,9 @@ class ThreadedDrillSessionHandler(QThread):
 
         # Save the drill profile to the goalie's name
         if self.goalie_name is not None:
-            self.profiler.save_drill_to_goalie_profile(
-                self.goalie_name, self.drill_name)
+            # self.profiler.save_drill_to_goalie_profile(
+            #     self.goalie_name, self.drill_name)
+            self.save_drill_to_goalie_profile()
 
         # Stop and reset all motors
         self.bfm.stop_and_reset_motor()
@@ -207,6 +211,32 @@ class ThreadedDrillSessionHandler(QThread):
         self.pm.stop_and_reset_motor()
 
         self.wait()
+
+    def save_drill_to_goalie_profile(self):
+        goalie_path = str(Path.home())+"/Documents/ball_e_profiles/goalie_profiles/{goalie_name}/{goalie_name}.csv".format(
+            goalie_name=self.goalie_name)
+        with open(goalie_path, 'a+', newline='') as file:
+            csv_writer = csv.writer(file, delimiter=",")
+            # Row written as "Drill Name, MM/DD/YYYY"
+            drill_info = ["{}".format(self.drill_name.replace("_", " ").title()), "{}".format(
+                datetime.datetime.today().strftime("%m/%d/%Y"))]
+            csv_writer.writerow(drill_info)
+
+    def get_profile_info(self):
+        drill_path = str(Path.home())+"/Documents/ball_e_profiles/drill_profiles/{drill_name}/{drill_name}.csv".format(
+            drill_name=self.drill_name)
+        with open(drill_path) as file:
+            csv_reader = csv.reader(file, delimiter=',')
+            row_count = 0
+            info_dict = dict()
+            for row in csv_reader:
+                if row_count == 0:
+                    row_count += 1
+                else:
+                    info_dict[row[0]] = [row[1], row[2], row[3]]
+                    row_count += 1
+
+        return info_dict
 
 
 def run_manual_session():
