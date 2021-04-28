@@ -120,14 +120,18 @@ class ThreadedDrillSessionHandler(QThread):
             print("curr-prev pitch angle: {}\n".format(target_pitch_angle))
 
             # 1.2: Set pitch and yaw at that angle
-            if target_yaw_angle <= 0:
+            if target_yaw_angle < 0:
                 self.ym.move_left(target_yaw_angle)
-            else:
+            elif target_yaw_angle > 0:
                 self.ym.move_right(target_yaw_angle)
-            if target_pitch_angle <= 0:
-                self.pm.pitch_down(target_pitch_angle)
             else:
+                pass
+            if target_pitch_angle < 0:
+                self.pm.pitch_down(target_pitch_angle)
+            elif target_pitch_angle > 0:
                 self.pm.pitch_up(target_pitch_angle)
+            else:
+                pass
 
             # 2. Set the speed of both flywheels
             self.set_flywheel_speeds(ball_speed)
