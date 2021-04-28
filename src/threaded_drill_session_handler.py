@@ -189,7 +189,7 @@ class ThreadedDrillSessionHandler(QThread):
         """Executes all steps required when drill has been stopped or has ended
         """
         self.run_drill = False
-        self.run_drill_signal = False
+        self.run_drill_signal.emit(False)
 
         # Save the drill profile to the goalie's name
         if self.goalie_name is not None:
