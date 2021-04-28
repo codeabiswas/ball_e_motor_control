@@ -46,7 +46,7 @@ class ThreadedDrillSessionHandler(QThread):
 
         if self.drill_name is not None:
             # Load the drill process
-            self.profiler = helper_profiler.Profiler()
+            self.profiler = helper_profiler.Profiler
             self.drill_info = self.profiler.get_profile_info(self.drill_name)
 
             self.rof = int(self.drill_info['1'][2])
