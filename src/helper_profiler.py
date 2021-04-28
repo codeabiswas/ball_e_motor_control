@@ -16,7 +16,8 @@ class Profiler:
                 datetime.datetime.today().strftime("%m/%d/%Y"))]
             csv_writer.writerow(drill_info)
 
-    def get_profile_info(self, drill_name):
+    @staticmethod
+    def get_profile_info(drill_name):
         drill_path = str(Path.home())+"/Documents/ball_e_profiles/drill_profiles/{drill_name}/{drill_name}.csv".format(
             drill_name=drill_name)
         with open(drill_path) as file:
