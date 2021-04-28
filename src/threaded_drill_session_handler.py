@@ -94,6 +94,7 @@ class ThreadedDrillSessionHandler(QThread):
             self.run_manual_drill(
                 shot_loc=each_ball_info[0], ball_speed=int(each_ball_info[1]))
             self.update_ball_num_signal.emit(True)
+        self.stop_drill()
 
     def run_manual_drill(self, shot_loc, ball_speed):
         """Runs a manual drill session
