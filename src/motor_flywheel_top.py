@@ -8,7 +8,7 @@ class MotorFlywheelTop:
     """The Top Flywheel Motor will be controlled using the 'Unipolar PWM command'. This motor will be running counter-clockwise.
     """
 
-    def __init__(self, speed_unset_callback_func):
+    def __init__(self, speed_unset_callback_func=None):
         """Any motor intiialization code will go here
 
         Enable Pin: Pin 29 - Energizes the motor
@@ -21,8 +21,8 @@ class MotorFlywheelTop:
         """
 
         # The flywheel's diameter (in inches)
-        # self.flywheel_diam = 16.5
-        self.flywheel_diam = 0.5
+        self.flywheel_diam = 16.5
+        # self.flywheel_diam = 0.5
         # The flywheel's circumference (in inches)
         self.flywheel_circ = self.flywheel_diam * math.pi
         # The flywheel motor's max RPM
@@ -92,7 +92,7 @@ class MotorFlywheelTop:
         self.pwm.ChangeDutyCycle(req_duty_cycle)
 
         # Block thread until speed has been set or timeout of 10 seconds has been reached (whichever is first)
-        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=2000)
 
         return True
 

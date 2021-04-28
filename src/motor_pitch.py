@@ -36,7 +36,7 @@ class MotorPitch:
         self.motor_on = False
 
         # Stores how many degrees yaw mechanism moves with one rotation of the motor
-        self.rotation_to_degree = 10
+        self.rotation_to_degree = 1
 
         # This variable will store the position of the motor (By default, it should be centered - cnt. 0)
         self.curr_encoder_count = 0
@@ -75,10 +75,12 @@ class MotorPitch:
             self.pulse_enable()
 
         # Block the thread until rising edge has been detected OR 10 seconds have passed (whichever is first)
-        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=2000)
 
         # Update the state of position variable
         self.curr_encoder_count += num_pulses
+        print('hit updating count for pitch up: {}'.format(
+            self.curr_encoder_count))
 
     def pitch_down(self, degree, num_pulses=None):
         """Yaw motor moves left by X degree
@@ -95,10 +97,12 @@ class MotorPitch:
             self.pulse_enable()
 
         # Block the thread until rising edge has been detected OR 10 seconds have passed (whichever is first)
-        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=10000)
+        gpio.wait_for_edge(self.hlfb_pin, gpio.RISING, timeout=2000)
 
         # Update the state of position variable
         self.curr_encoder_count -= num_pulses
+        print('hit updating count for pitch down: {}'.format(
+            self.curr_encoder_count))
 
     def get_motor_state(self):
         """Returns whether or not the motor is energized
@@ -117,6 +121,7 @@ class MotorPitch:
     def reset_pitch(self):
         """Resets the pitch motor to center
         """
+        print("resetting pitch w/ encoder count: {}".format(self.curr_encoder_count))
 
         # Pitch motor facing up, so move the opposite direction to reset
         if self.curr_encoder_count > 0:

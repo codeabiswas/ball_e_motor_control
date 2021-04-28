@@ -36,7 +36,9 @@ class Profiler():
 def main():
     some_profiler = Profiler()
     some_profiler.save_drill_to_goalie_profile("andrei_biswas", "drill_a")
-    print(some_profiler.get_profile_info("drill_a"))
+    drill_dict = some_profiler.get_profile_info("drill_a")
+    # Get ROF
+    print(drill_dict['1'][2])
 
 
 if __name__ == "__main__":
