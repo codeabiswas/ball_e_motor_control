@@ -24,6 +24,7 @@ class ThreadedDrillSessionHandler(QThread):
     """This class handles all actual automated or manual drill execution, including sending instructions to motors appropriately
     """
     run_drill_signal = pyqtSignal(bool)
+    update_ball_num_signal = pyqtSignal(bool)
 
     def __init__(self, distance_from_goal, drill_name=None, goalie_name=None):
         """Initializes the drill session handler
@@ -89,6 +90,7 @@ class ThreadedDrillSessionHandler(QThread):
         for each_ball_info in self.drill_info.values():
             self.run_manual_drill(
                 shot_loc=each_ball_info[0], ball_speed=int(each_ball_info[1]))
+            self.update_ball_num_signal.emit(True)
 
     def run_manual_drill(self, shot_loc, ball_speed):
         """Runs a manual drill session
