@@ -277,7 +277,7 @@ def run_automated_session():
     automated_session = ThreadedDrillSessionHandler(10, drill_name="t_drill")
     automated_session.start_drill()
     automated_session.run_automated_drill()
-    automated_session.stop_drill()
+    # automated_session.stop_drill()
 
 
 def main():
