@@ -16,6 +16,7 @@ finally:
     import helper_profiler
     import motor_ball_feed_vel
     import motor_ball_queue
+    import motor_ball_queue_updated
     import motor_flywheel_bottom
     import motor_flywheel_top
     import motor_pitch
@@ -60,7 +61,8 @@ class ThreadedDrillSessionHandler(QThread):
 
         # Initialize all motors
         self.bfm = motor_ball_feed_vel.MotorBallFeed()
-        self.bqm = motor_ball_queue.MotorBallQueue()
+        self.bqm = motor_ball_queue_updated.MotorBallQueue()
+        # self.bqm = motor_ball_queue.MotorBallQueue()
         self.fmt = motor_flywheel_top.MotorFlywheelTop()
         self.fmb = motor_flywheel_bottom.MotorFlywheelBottom()
         self.pm = motor_pitch.MotorPitch()
@@ -159,12 +161,13 @@ class ThreadedDrillSessionHandler(QThread):
     def bqm_move_queue(self):
         """Rotates the ball queue so that a ball can drop into the ball feed
         """
-        if self.first_ball == 0:
-            self.bqm.turn_once_half()
-        else:
-            self.bqm.turn_once_full()
+        # if self.first_ball == 0:
+        #     self.bqm.turn_once_half()
+        # else:
+        #     self.bqm.turn_once_full()
 
-        self.first_ball += 1
+        # self.first_ball += 1
+        self.bqm.turn_once()
 
     def bfm_shoot_movement(self):
         """Ball feeding mechanism movement
