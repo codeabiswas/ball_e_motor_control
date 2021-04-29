@@ -5,18 +5,16 @@ try:
         "{}/Developer/ball_e_image_processing/src".format(Path.home()))
     import trajectory_algorithm
 except:
-    print("Import failed")
+    print("{}: Imports failed".format(__file__))
 finally:
     import csv
     import datetime
     import time
 
-    from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
+    from PyQt5.QtCore import QThread, pyqtSignal
 
-    import helper_profiler
     import motor_ball_feed_vel
-    import motor_ball_queue
-    import motor_ball_queue_updated
+    import motor_ball_queue_turn_once
     import motor_flywheel_bottom
     import motor_flywheel_top
     import motor_pitch
@@ -61,7 +59,7 @@ class ThreadedDrillSessionHandler(QThread):
 
         # Initialize all motors
         self.bfm = motor_ball_feed_vel.MotorBallFeed()
-        self.bqm = motor_ball_queue_updated.MotorBallQueue()
+        self.bqm = motor_ball_queue_turn_once.MotorBallQueue()
         # self.bqm = motor_ball_queue.MotorBallQueue()
         self.fmt = motor_flywheel_top.MotorFlywheelTop()
         self.fmb = motor_flywheel_bottom.MotorFlywheelBottom()
