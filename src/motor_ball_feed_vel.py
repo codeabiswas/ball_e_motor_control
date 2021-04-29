@@ -48,7 +48,7 @@ class MotorBallFeed:
         # Motor is now energized
         self.motor_on = True
 
-    def move_forward(self, rof_time=1):
+    def move_forward(self, rof_time=1.1):
         """Feed moves forward (pos. 2)
         """
 
@@ -63,7 +63,7 @@ class MotorBallFeed:
         # Update the state of position variable
         self.bfm_pos = 2
 
-    def move_backward(self, rof_time=1):
+    def move_backward(self, rof_time=1.1):
         """Feed moves backward (pos. 1)
         """
 
