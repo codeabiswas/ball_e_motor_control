@@ -77,6 +77,7 @@ class ThreadedDrillSessionHandler(QThread):
         # Enable all motors
         # NOTE 1: Order matters!
         # NOTE 2: BFM not energized since it will cause motor to move
+        self.bfm_startup
         self.fmt.energize_motor()
         self.fmb.energize_motor()
         self.ym.energize_motor()
@@ -167,6 +168,19 @@ class ThreadedDrillSessionHandler(QThread):
         # self.first_ball += 1
         self.bqm.turn_once()
 
+    def bfm_startup(self):
+        """Ball feeding mechanism movement
+        """
+
+        # TODO: Wait for some time based on ROF
+
+        # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
+        # Currently waiting 1.1 seconds each direction of the bfm movement
+        # 2.2 seconds total
+        # So wait (ROF-2.2)/2 in each direction and hope that the LAX ball has fallen by then
+
+        self.bfm.move_backward(rof_time=0.25)
+
     def bfm_shoot_movement(self):
         """Ball feeding mechanism movement
         """
@@ -252,13 +266,13 @@ def run_manual_session():
     time.sleep(2)
     print("Shoot at TR with speed 30...")
     manual_session.run_manual_drill(shot_loc="TR", ball_speed=30)
-    time.sleep(2)
-    print("Shoot at BL with speed 30...")
-    manual_session.run_manual_drill(shot_loc="BL", ball_speed=30)
-    time.sleep(2)
-    print("Shoot at CM with speed 65...")
-    manual_session.run_manual_drill(shot_loc="CM", ball_speed=65)
-    time.sleep(2)
+    #time.sleep(2)
+    #print("Shoot at BL with speed 30...")
+    #manual_session.run_manual_drill(shot_loc="BL", ball_speed=30)
+    #time.sleep(2)
+    #print("Shoot at CM with speed 65...")
+    #manual_session.run_manual_drill(shot_loc="CM", ball_speed=65)
+    #time.sleep(2)
     # print("Shoot at TL with speed 30...")
     # manual_session.run_manual_drill(shot_loc="TL", ball_speed=30)
     # time.sleep(5)
@@ -279,8 +293,8 @@ def run_automated_session():
 
 
 def main():
-    # run_manual_session()
-    run_automated_session()
+    run_manual_session()
+    #run_automated_session()
 
 
 if __name__ == "__main__":
