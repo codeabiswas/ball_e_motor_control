@@ -169,7 +169,7 @@ class ThreadedDrillSessionHandler(QThread):
         self.bqm.turn_once()
 
     def bfm_startup(self):
-        """Ball feeding mechanism movement
+        """Ball feeding mechanism at start to ensure no jams
         """
 
         # TODO: Wait for some time based on ROF
