@@ -82,7 +82,7 @@ def main():
     motor_bqm.energize_motor()
     # Get energized state of motor
     print(motor_bqm.get_motor_state())
-    for _ in range(3):
+    for _ in range(18):
         # Move motor forwards
         motor_bqm.turn_once()
         time.sleep(2)
