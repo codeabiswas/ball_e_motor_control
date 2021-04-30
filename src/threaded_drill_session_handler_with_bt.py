@@ -3,6 +3,9 @@ try:
     from pathlib import Path
     sys.path.append(
         "{}/Developer/ball_e_image_processing/src".format(Path.home()))
+    sys.path.append(
+        "{}/Developer/ball_e_bt/src".format(Path.home()))
+    import threaded_bt_helper
     import trajectory_algorithm
 except:
     print("{}: Imports failed".format(__file__))
@@ -11,7 +14,7 @@ finally:
     import datetime
     import time
 
-    from PyQt5.QtCore import QThread, pyqtSignal
+    from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 
     import motor_ball_feed_vel
     import motor_ball_queue_turn_once
@@ -37,6 +40,9 @@ class ThreadedDrillSessionHandler(QThread):
         """
         super().__init__()
         self.run_drill = True
+
+        self.threaded_bt_helper = threaded_bt_helper()
+        self.threaded_bt_helper.bt_button_click.connect(self.bt_button_click)
 
         self.drill_name = drill_name
         self.goalie_name = goalie_name
@@ -172,13 +178,6 @@ class ThreadedDrillSessionHandler(QThread):
         """Ball feeding mechanism at start to ensure no jams
         """
 
-        # TODO: Wait for some time based on ROF
-
-        # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
-        # Currently waiting 1.1 seconds each direction of the bfm movement
-        # 2.2 seconds total
-        # So wait (ROF-2.2)/2 in each direction and hope that the LAX ball has fallen by then
-
         self.bfm.move_backward(en_time=0.25)
 
     def bfm_shoot_movement(self):
@@ -257,6 +256,14 @@ class ThreadedDrillSessionHandler(QThread):
                     row_count += 1
 
         return info_dict
+
+    @pyqtSlot(bool)
+    def bt_button_click(self, bool_val):
+        if bool_val and self.first_ball:
+            self.start_drill()
+        else:
+            self.stop_drill()
+            self.threaded_bt_helper.disconnect_from_button()
 
 
 def run_manual_session():
