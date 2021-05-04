@@ -1,3 +1,14 @@
+"""
+motor_flywheel_bottom.py
+---
+This file contains the MotorFlywheelBottom class, which controls the Flywheel Bottom Motor (FBM) using Pulse-Width Modulation (PWM).
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import math
 import time
 
@@ -8,7 +19,7 @@ class MotorFlywheelBottom:
     """The Bottom Flywheel Motor will be controlled using the 'Unipolar PWM command'. This motor will be running clockwise.
     """
 
-    def __init__(self, speed_unset_callback_func=None):
+    def __init__(self):
         """Any motor intiialization code will go here
 
         Enable Pin: Pin 31 - Energizes the motor
@@ -21,7 +32,6 @@ class MotorFlywheelBottom:
 
         # The flywheel's diameter (in inches)
         self.flywheel_diam = 16.5
-        # self.flywheel_diam = 0.5
         # The flywheel's circumference (in inches)
         self.flywheel_circ = self.flywheel_diam * math.pi
         # The flywheel motor's max RPM
@@ -42,11 +52,9 @@ class MotorFlywheelBottom:
         # Enable pin set to low (unenergized)
         # Input B pin set to low
         # HLFB pin set as input
-        self.ftm_out_channels = [self.en_pin, self.in_b_pin]
-        gpio.setup(self.ftm_out_channels, gpio.OUT, initial=gpio.LOW)
+        self.fbm_out_channels = [self.en_pin, self.in_b_pin]
+        gpio.setup(self.fbm_out_channels, gpio.OUT, initial=gpio.LOW)
         gpio.setup(self.hlfb_pin, gpio.IN)
-        # gpio.add_event_detect(self.hlfb_pin, gpio.FALLING,
-        #                       callback=speed_unset_callback_func)
 
         # Initialize PWM w/ frequency
         self.pwm = gpio.PWM(self.in_b_pin, self.pwm_freq)
@@ -92,6 +100,8 @@ class MotorFlywheelBottom:
 
     def hlfb_output(self):
         """Returns whether the required speed has been attained  by the motor's encoder (using HLFB: ASG velocity)
+
+        NOTE: This currently does not work since Teknic does not support this HLFB mode for this velocity mode anymore
         """
 
         return gpio.input(self.hlfb_pin)
@@ -114,20 +124,21 @@ class MotorFlywheelBottom:
         # Unenergize the motor
         gpio.output(self.en_pin, gpio.LOW)
 
-        # Clean all FTM-related channels
+        # Clean all FBM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
-        gpio.cleanup(self.ftm_out_channels)
+        gpio.cleanup(self.fbm_out_channels)
         gpio.cleanup(self.hlfb_pin)
 
         # Motor is not energized
         self.motor_on = False
 
 
-def dummy_speed_unset_callback_func():
-    print("Speed changing")
-
-
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_bottom_flywheel = MotorFlywheelBottom(
         speed_unset_callback_func=dummy_speed_unset_callback_func
@@ -153,4 +164,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

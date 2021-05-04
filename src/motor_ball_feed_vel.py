@@ -1,3 +1,15 @@
+"""
+motor_ball_feed_vel.py
+---
+This file contains the MotorBallFeed class, which controls the Ball Feed Motor (BFM) using timed velocity.
+NOTE: This is the file that is being used by the current iteration of the project as of Spring Semester 2021.
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import time
 
 import Jetson.GPIO as gpio
@@ -50,6 +62,8 @@ class MotorBallFeed:
 
     def move_forward(self, en_time=1.1):
         """Feed moves forward (pos. 2)
+
+        NOTE: en_time has been measured to work for the current iteration of the ball feed mechanical design
         """
 
         # Set Input A to high to move to position 2
@@ -65,6 +79,8 @@ class MotorBallFeed:
 
     def move_backward(self, en_time=1.1):
         """Feed moves backward (pos. 1)
+
+        NOTE: en_time has been measured to work for the current iteration of the ball feed mechanical design
         """
 
         # Set Input A to high to move to position 2
@@ -117,6 +133,11 @@ class MotorBallFeed:
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_ball_feed = MotorBallFeed()
     # time.sleep(2)
@@ -138,4 +159,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

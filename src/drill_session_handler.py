@@ -1,11 +1,23 @@
+"""
+drill_session_handler.py
+---
+This file contains the DrillSessionHandler class, which controls a manual or automated drill session
+NOTE: This file is not used by the GUI currently. Only threaded_drill_session_handler.py is.
+---
+
+Author: Andrei Biswas (@codeabiswas), Darian Dzirko (@dariandzirko)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 try:
     import sys
     from pathlib import Path
     sys.path.append(
         "{}/Developer/ball_e_image_processing/src".format(Path.home()))
     import trajectory_algorithm
-except:
-    print("Import failed")
+except ImportError:
+    print("{}: Imports failed".format(__file__))
 finally:
     import time
 
@@ -153,8 +165,6 @@ class DrillSessionHandler:
         """Ball feeding mechanism movement
         """
 
-        # TODO: Wait for some time based on ROF
-
         # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
         # Currently waiting 1.1 seconds each direction of the bfm movement
         # 2.2 seconds total
@@ -196,6 +206,11 @@ class DrillSessionHandler:
 
 
 def run_manual_session():
+    """run_manual_session.
+
+    This functions tests a manual training session.
+    """
+
     manual_session = DrillSessionHandler(10)
     print("Enabling all motors...")
     manual_session.start_drill()
@@ -222,6 +237,11 @@ def run_manual_session():
 
 
 def run_automated_session():
+    """run_automated_session.
+
+    This function tests an automated training session.
+    """
+
     automated_session = DrillSessionHandler(10, drill_name="t_drill")
     automated_session.start_drill()
     automated_session.run_automated_drill()
@@ -229,9 +249,15 @@ def run_automated_session():
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # run_manual_session()
     run_automated_session()
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

@@ -1,10 +1,22 @@
+"""
+motor_ball_feed.py
+---
+This file contains the MotorBallFeed class, which controls the Ball Feed Motor (BFM) using measured position values.
+NOTE: Although this should be the version that is to be used, there was oversight on how this control mode did its homing routing which affected how the PCB was built. Hence, this is not the file being used in the current iteration of the project. The file being used is motor_ball_feed_vel.py.
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import time
 
 import Jetson.GPIO as gpio
 
 
 class MotorBallFeed:
-    """The Ball Feed Motor will be controlled using the 'Move to Absolute Position (2-Position, Home to Switch)' Setting. As Teknik puts it, 'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
+    """The Ball Feed Motor will be controlled using the 'Move to Absolute Position (2-Position, Home to Switch)' Setting. As Teknik puts it, 'this mode was designed for replacing hydraulic or pneumatic cylinders that move between two positions'
     """
 
     def __init__(self):
@@ -102,6 +114,11 @@ class MotorBallFeed:
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_ball_feed = MotorBallFeed()
     time.sleep(2)
@@ -127,4 +144,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

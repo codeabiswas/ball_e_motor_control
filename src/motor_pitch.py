@@ -1,15 +1,25 @@
+"""
+motor_pitch.py
+---
+This file contains the MotorPitch class, which controls the Pitch Motor (PM) using calculated encoder values.
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import time
 
 import Jetson.GPIO as gpio
 
 
 class MotorPitch:
-    """The PM Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. As Teknik puts it,
-    'this mode was designed for replacing hydraulic or pnewmatic cylinders that move between two positions'
+    """The PM Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. 
     """
 
     def __init__(self):
-        """Any motor intiialization code will go here
+        """Any motor intialization code will go here
         Enable Pin: Pin 21- Energizes the motor
         Input A: Pin 23 - Selects the position (0 is pos. 1 and 1 is pos. 2)
         Input B: Pin 6 (GND)
@@ -143,7 +153,7 @@ class MotorPitch:
         # Unenergize the motor
         gpio.output(self.en_pin, gpio.LOW)
 
-        # Clean all YM-related channels
+        # Clean all PM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
         gpio.cleanup(self.pm_channels)
         gpio.cleanup(self.hlfb_pin)
@@ -153,6 +163,11 @@ class MotorPitch:
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_pitch = MotorPitch()
     # Turn motor on
@@ -177,4 +192,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

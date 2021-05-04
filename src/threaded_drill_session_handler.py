@@ -1,3 +1,15 @@
+"""
+threaded_drill_session_handler.py
+---
+This file contains the ThreadedDrillSessionHandler class, which controls a manual or automated drill session. This is also uses QThread, so that it can be called and handled by the GUI.
+NOTE: This is the file that is being used by the current iteration of the project as of Spring Semester 2021.
+---
+
+Author: Andrei Biswas (@codeabiswas), Darian Dzirko (@dariandzirko)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 try:
     import sys
     from pathlib import Path
@@ -24,6 +36,8 @@ finally:
 class ThreadedDrillSessionHandler(QThread):
     """This class handles all actual automated or manual drill execution, including sending instructions to motors appropriately
     """
+
+    # Instantiating PyQt signals that will be used to communicate with the GUI
     run_drill_signal = pyqtSignal(bool)
     update_ball_num_signal = pyqtSignal(bool)
 
@@ -35,6 +49,7 @@ class ThreadedDrillSessionHandler(QThread):
             drill_name ([str], optional): Name of the drill to be executed for an automated session. If manual training session, defaults to None.
             goalie_name ([str], optional): Goalie's name for an automated session. If manual training, defaults to None.
         """
+
         super().__init__()
         self.run_drill = True
 
@@ -42,15 +57,11 @@ class ThreadedDrillSessionHandler(QThread):
         self.goalie_name = goalie_name
         self.distance_from_goal = distance_from_goal
 
-        # The first ball (index 0) means ball queue needs to rotate 1/36. The rest will rotate 1/18.
-        self.first_ball = True
-
         if self.drill_name is not None:
-            # Load the drill process
-            # self.profiler = helper_profiler.Profiler()
-            # self.drill_info = self.profiler.get_profile_info(self.drill_name)
+            # Get drill information and save it
             self.drill_info = self.get_profile_info()
 
+            # Acquire Rate of Fire (ROF) of the drill
             self.rof = int(self.drill_info['1'][2])
 
         # Initialize Trajectory Algorithm Helper
@@ -60,7 +71,6 @@ class ThreadedDrillSessionHandler(QThread):
         # Initialize all motors
         self.bfm = motor_ball_feed_vel.MotorBallFeed()
         self.bqm = motor_ball_queue_turn_once.MotorBallQueue()
-        # self.bqm = motor_ball_queue.MotorBallQueue()
         self.fmt = motor_flywheel_top.MotorFlywheelTop()
         self.fmb = motor_flywheel_bottom.MotorFlywheelBottom()
         self.pm = motor_pitch.MotorPitch()
@@ -71,12 +81,11 @@ class ThreadedDrillSessionHandler(QThread):
 
     def start_drill(self):
         """Executes all the steps required to start an automated or manual drill, such as enabling the motor
-        NOTE: Possibly store all possible pitch and yaw angle requirements from the current position here. This would expedite the shooting process
         """
 
         # Enable all motors
         # NOTE 1: Order matters!
-        # NOTE 2: BFM not energized since it will cause motor to move
+        # NOTE 2: BFM not energized since it will cause motor to move but it is pushed back a bit to ensure the feed is all the way back.
         self.bfm_startup()
         self.fmt.energize_motor()
         self.fmb.energize_motor()
@@ -86,15 +95,19 @@ class ThreadedDrillSessionHandler(QThread):
         self.bqm.energize_motor()
 
         # Enabling motors takes time
+        # NOTE: This may need to be optimized after all the motors have been tuned to make the process faster
         time.sleep(2)
 
     def run_automated_drill(self):
         """Runs an automated drill session
         """
+        # Go through each ball and shoot it
         for each_ball_info in self.drill_info.values():
             self.run_manual_drill(
                 shot_loc=each_ball_info[0], ball_speed=int(each_ball_info[1]))
+            # Update the ball number in the GUI
             self.update_ball_num_signal.emit(True)
+        # When complete, stop the drill
         self.stop_drill()
 
     def run_manual_drill(self, shot_loc, ball_speed):
@@ -109,16 +122,18 @@ class ThreadedDrillSessionHandler(QThread):
             # 1. Adjust pitch and yaw motor appropriately
             # 1.1: Get which goal area it the drill shot needs to happen in terms of angle that pitch and yaw need to be adjusted
             yaw_angle, pitch_angle = self.get_shot_angles(shot_loc)
-            print("curr yaw angle: {}".format(yaw_angle))
-            print("curr pitch angle: {}".format(pitch_angle))
+            # print("curr yaw angle: {}".format(yaw_angle))
+            # print("curr pitch angle: {}".format(pitch_angle))
             prev_yaw_angle, prev_pitch_angle = self.get_shot_angles(
                 self.prev_shot_loc)
-            print("prev yaw angle: {}".format(prev_yaw_angle))
-            print("prev pitch angle: {}".format(prev_pitch_angle))
+            # print("prev yaw angle: {}".format(prev_yaw_angle))
+            # print("prev pitch angle: {}".format(prev_pitch_angle))
+
+            # This is the relative angle we want to move the pitch and yaw contraptions by
             target_yaw_angle = yaw_angle - prev_yaw_angle
             target_pitch_angle = pitch_angle - prev_pitch_angle
-            print("curr-prev yaw angle: {}".format(target_yaw_angle))
-            print("curr-prev pitch angle: {}\n".format(target_pitch_angle))
+            # print("curr-prev yaw angle: {}".format(target_yaw_angle))
+            # print("curr-prev pitch angle: {}\n".format(target_pitch_angle))
 
             # 1.2: Set pitch and yaw at that angle
             if target_yaw_angle < 0:
@@ -160,32 +175,17 @@ class ThreadedDrillSessionHandler(QThread):
     def bqm_move_queue(self):
         """Rotates the ball queue so that a ball can drop into the ball feed
         """
-        # if self.first_ball == 0:
-        #     self.bqm.turn_once_half()
-        # else:
-        #     self.bqm.turn_once_full()
-
-        # self.first_ball += 1
         self.bqm.turn_once()
 
     def bfm_startup(self):
-        """Ball feeding mechanism at start to ensure no jams
+        """Ball feeding mechanism movement at start to ensure no jams
         """
-
-        # TODO: Wait for some time based on ROF
-
-        # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
-        # Currently waiting 1.1 seconds each direction of the bfm movement
-        # 2.2 seconds total
-        # So wait (ROF-2.2)/2 in each direction and hope that the LAX ball has fallen by then
 
         self.bfm.move_backward(en_time=0.25)
 
     def bfm_shoot_movement(self):
         """Ball feeding mechanism movement
         """
-
-        # TODO: Wait for some time based on ROF
 
         # Move the feed motor forward, wait for it to get caught into the flywheels, then come back
         # Currently waiting 1.1 seconds each direction of the bfm movement
@@ -214,12 +214,11 @@ class ThreadedDrillSessionHandler(QThread):
         """Executes all steps required when drill has been stopped or has ended
         """
         self.run_drill = False
+        # Stop running the drill
         self.run_drill_signal.emit(False)
 
         # Save the drill profile to the goalie's name
         if self.goalie_name is not None:
-            # self.profiler.save_drill_to_goalie_profile(
-            #     self.goalie_name, self.drill_name)
             self.save_drill_to_goalie_profile()
 
         # Stop and reset all motors
@@ -230,9 +229,15 @@ class ThreadedDrillSessionHandler(QThread):
         self.ym.stop_and_reset_motor()
         self.pm.stop_and_reset_motor()
 
+        # Wait to kill thread
         self.wait()
 
     def save_drill_to_goalie_profile(self):
+        """save_drill_to_goalie_profile.
+
+        This function saves a drill to a goalie profile
+        """
+
         goalie_path = str(Path.home())+"/Documents/ball_e_profiles/goalie_profiles/{goalie_name}/{goalie_name}.csv".format(
             goalie_name=self.goalie_name)
         with open(goalie_path, 'a+', newline='') as file:
@@ -243,6 +248,11 @@ class ThreadedDrillSessionHandler(QThread):
             csv_writer.writerow(drill_info)
 
     def get_profile_info(self):
+        """get_profile_info.
+
+        This function acquires and formats pertaining drill information
+        """
+
         drill_path = str(Path.home())+"/Documents/ball_e_profiles/drill_profiles/{drill_name}/{drill_name}.csv".format(
             drill_name=self.drill_name)
         with open(drill_path) as file:
@@ -260,6 +270,11 @@ class ThreadedDrillSessionHandler(QThread):
 
 
 def run_manual_session():
+    """run_manual_session.
+
+    This functions tests a manual training session.
+    """
+
     manual_session = ThreadedDrillSessionHandler(10)
     print("Enabling all motors...")
     manual_session.start_drill()
@@ -286,16 +301,26 @@ def run_manual_session():
 
 
 def run_automated_session():
+    """run_automated_session.
+
+    This function tests an automated training session.
+    """
+
     automated_session = ThreadedDrillSessionHandler(10, drill_name="t_drill")
     automated_session.start_drill()
     automated_session.run_automated_drill()
-    # automated_session.stop_drill()
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     run_manual_session()
     # run_automated_session()
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

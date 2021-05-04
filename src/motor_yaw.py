@@ -1,14 +1,25 @@
+"""
+motor_yaw.py
+---
+This file contains the MotorYaw class, which controls the Yaw Motor (YM) using calculated encoder values.
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import time
 
 import Jetson.GPIO as gpio
 
 
 class MotorYaw:
-    """
+    """The YM Motor will be controlled using the 'Move to Move to Incremental Distance (2 Distance, Home To Switch)' Setting. 
     """
 
     def __init__(self):
-        """Any motor intiialization code will go here
+        """Any motor intialization code will go here
         Enable Pin: Pin 24 - Energizes the motor
         Input A: Pin 26 - Selects the distance (0 is dist. 1 and 1 is dist. 2)
         Input B: Pin 6 (GND)
@@ -154,6 +165,11 @@ class MotorYaw:
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_yaw = MotorYaw()
     # Turn motor on
@@ -178,4 +194,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

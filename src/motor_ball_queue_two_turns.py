@@ -1,3 +1,15 @@
+"""
+motor_ball_queue_two_turns.py
+---
+This file contains the MotorBallQueue class, which controls the Ball Queue Motor (BQM).
+NOTE: This is the file that is not being used by the current iteration of the project as of Spring Semester 2021 simply because it was found that moving the queue once (as done in motor_ball_queue_turn_once.py) is sufficient enough for ensuring only 1 ball drops at a time.
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import time
 
 import Jetson.GPIO as gpio
@@ -86,7 +98,7 @@ class MotorBallQueue:
         # Turn off motor
         gpio.output(self.en_pin, gpio.LOW)
 
-        # Clean all BFM-related channels
+        # Clean all BQM-related channels
         # NOTE: Doing this means the pins have been set to their default state, and init method needs to be called again to make this motor work
         gpio.cleanup(self.bqm_channels)
 
@@ -95,6 +107,11 @@ class MotorBallQueue:
 
 
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
     motor_bqm = MotorBallQueue()
     # Turn motor on
@@ -116,4 +133,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()

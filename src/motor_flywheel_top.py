@@ -1,3 +1,14 @@
+"""
+motor_flywheel_top.py
+---
+This file contains the MotorFlywheelTop class, which controls the Flywheel Top Motor (FTM) using Pulse-Width Modulation (PWM).
+---
+
+Author: Andrei Biswas (@codeabiswas)
+Date: May 4, 2021
+Last Modified: May 04, 2021
+"""
+
 import math
 import time
 
@@ -8,7 +19,7 @@ class MotorFlywheelTop:
     """The Top Flywheel Motor will be controlled using the 'Unipolar PWM command'. This motor will be running counter-clockwise.
     """
 
-    def __init__(self, speed_unset_callback_func=None):
+    def __init__(self):
         """Any motor intiialization code will go here
 
         Enable Pin: Pin 29 - Energizes the motor
@@ -16,18 +27,14 @@ class MotorFlywheelTop:
         Input B: Pin 32 (PWM0)
         HLFB: Pin 11 - ASG Velocity
 
-        speed_set_callback_func: Pointer for function to call when the desired speed has been achieved
-        speed_unset_callback_func: Pointer for function to call when target speed has not been achieved
         """
 
         # The flywheel's diameter (in inches)
         self.flywheel_diam = 16.5
-        # self.flywheel_diam = 0.5
         # The flywheel's circumference (in inches)
         self.flywheel_circ = self.flywheel_diam * math.pi
         # The flywheel motor's max RPM
         self.fm_max_rpm = 3180
-        # self.fm_max_rpm = 1000
 
         # Board pin-numbering scheme
         gpio.setmode(gpio.BOARD)
@@ -47,8 +54,6 @@ class MotorFlywheelTop:
         self.ftm_out_channels = [self.en_pin, self.in_b_pin]
         gpio.setup(self.ftm_out_channels, gpio.OUT, initial=gpio.LOW)
         gpio.setup(self.hlfb_pin, gpio.IN)
-        # gpio.add_event_detect(self.hlfb_pin, gpio.FALLING,
-        #                       callback=speed_unset_callback_func)
 
         # Initialize PWM w/ frequency
         self.pwm = gpio.PWM(self.in_b_pin, self.pwm_freq)
@@ -98,6 +103,8 @@ class MotorFlywheelTop:
 
     def hlfb_output(self):
         """Returns whether the required speed has been attained  by the motor's encoder (using HLFB: ASG velocity)
+
+        NOTE: This currently does not work since Teknic does not support this HLFB mode for this velocity mode anymore
         """
 
         return gpio.input(self.hlfb_pin)
@@ -129,15 +136,14 @@ class MotorFlywheelTop:
         self.motor_on = False
 
 
-def dummy_speed_unset_callback_func():
-    print("Speed changing")
-
-
 def main():
+    """main.
+
+    Main prototype/testing area. Code prototyping and checking happens here.
+    """
+
     # Initialize object
-    motor_top_flywheel = MotorFlywheelTop(
-        speed_unset_callback_func=dummy_speed_unset_callback_func
-    )
+    motor_top_flywheel = MotorFlywheelTop()
     # Turn motor on
     motor_top_flywheel.energize_motor()
     # Get energized state of motor
@@ -159,4 +165,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # Run the main function
     main()
